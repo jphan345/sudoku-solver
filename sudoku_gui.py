@@ -17,8 +17,7 @@ RED_2 = (148, 55, 47)
 ORANGE = (199, 130, 66)
 YELLOW = (207, 186, 68)
 YELLOW_GREEN = (200, 209, 67)
-GREEN_2 = (81, 138, 45)
-GREEN = (25, 140, 25)
+GREEN = (81, 138, 45)
 
 speed_1_col = RED_2
 speed_2_col = ORANGE
@@ -147,7 +146,7 @@ def solve_visual(board: list) -> bool:
         draw_empty_board(display)
         pygame.draw.rect(display, RED, ((45 + (col * 60) + (grid_x * 5), 120 + (row * 60) + (grid_y * 5)),
                                         square_size))
-        draw_numbers(display, board, GREEN_2)
+        draw_numbers(display, board, GREEN)
         draw_numbers(display, puzzle_copy, DARK_BLUE)
         pygame.display.update()
 
@@ -211,8 +210,6 @@ def draw_buttons(display: pygame.display, mouse_pos: pygame.mouse) -> None:
     button_font = pygame.font.SysFont('freesansbold.ttf', 48)
     solve_button_surface = button_font.render('SOLVE', True, DARK_BLUE)
     new_puzzle_button_surface = button_font.render('NEW PUZZLE', True, DARK_BLUE)
-
-    button_font_2 = pygame.font.SysFont('freesansbold.ttf', 24)
     solve_instant_button_surface = button_font.render('SOLVE', True, DARK_BLUE)
     solve_instant_2_button_surface = button_font.render('INSTANTLY', True, DARK_BLUE)
 
