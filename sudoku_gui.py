@@ -1,6 +1,7 @@
 import solver
 import pygame
 import sys
+import copy
 
 clock = pygame.time.Clock()
 SPEED = 120
@@ -35,6 +36,7 @@ puzzle = [[3, 0, 6, 5, 0, 8, 4, 0, 0],
           [1, 3, 0, 0, 0, 0, 2, 5, 0],
           [0, 0, 0, 0, 0, 0, 0, 7, 4],
           [0, 0, 5, 2, 0, 6, 3, 0, 0]]
+puzzle_copy = copy.deepcopy(puzzle)
 
 
 def draw_empty_board(display: pygame.display) -> None:
@@ -72,6 +74,7 @@ def solve_visual(board: list) -> bool:
     global speed_4_col
     global speed_5_col
     global SPEED
+    global puzzle
 
     coordinates = solver.find_empty(board)
     if not coordinates:
@@ -89,7 +92,7 @@ def solve_visual(board: list) -> bool:
         display.fill(DARK_BLUE)
 
         draw_empty_board(display)
-        draw_numbers(display, puzzle, DARK_BLUE)
+        draw_numbers(display, board, DARK_BLUE)
         draw_buttons(display, pygame.mouse.get_pos())
 
         for event in pygame.event.get():
@@ -98,6 +101,7 @@ def solve_visual(board: list) -> bool:
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
+                # Pressed one of the speed options
                 if 694 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
                     pygame.draw.rect(display, RED, ((689, 545), (65, 65)))
                     speed_2_col = GRAY
@@ -117,6 +121,14 @@ def solve_visual(board: list) -> bool:
                 if 953 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
                     speed_5_col = GREEN
                     SPEED = -1
+                # Pressed the 'SOLVE INSTANTLY' button
+                if 730 < mouse_pos[0] < 970 and 340 < mouse_pos[1] < 410:
+                    solver.solve(puzzle_copy)
+                    puzzle = puzzle_copy
+                    draw_empty_board(display)
+                    draw_numbers(display, puzzle_copy, DARK_BLUE)
+                    pygame.display.update()
+                    return True
 
         if solver.is_valid(board, row, col, i):
             board[row][col] = i
@@ -124,7 +136,8 @@ def solve_visual(board: list) -> bool:
             pygame.draw.rect(display, GREEN, ((45 + (col * 60) + (grid_x * 5), 120 + (row * 60) + (grid_y * 5)),
                                               square_size))
 
-            draw_numbers(display, board, DARK_BLUE)
+            draw_numbers(display, board, GREEN)
+            draw_numbers(display, puzzle_copy, DARK_BLUE)
             pygame.display.update()
 
             if solve_visual(board):
@@ -134,7 +147,8 @@ def solve_visual(board: list) -> bool:
         draw_empty_board(display)
         pygame.draw.rect(display, RED, ((45 + (col * 60) + (grid_x * 5), 120 + (row * 60) + (grid_y * 5)),
                                         square_size))
-        draw_numbers(display, board, DARK_BLUE)
+        draw_numbers(display, board, GREEN_2)
+        draw_numbers(display, puzzle_copy, DARK_BLUE)
         pygame.display.update()
 
     return False
@@ -143,6 +157,7 @@ def solve_visual(board: list) -> bool:
 def generate_puzzle() -> None:
     global puzzle_num
     global puzzle
+    global puzzle_copy
 
     puzzles = [[[3, 0, 6, 5, 0, 8, 4, 0, 0],
                 [5, 2, 0, 0, 0, 0, 0, 0, 0],
@@ -188,7 +203,8 @@ def generate_puzzle() -> None:
     if puzzle_num == 3:
         puzzle_num = -1
     puzzle_num += 1
-    puzzle = puzzles[puzzle_num]
+    puzzle = copy.deepcopy(puzzles[puzzle_num])
+    puzzle_copy = copy.deepcopy(puzzles[puzzle_num])
 
 
 def draw_buttons(display: pygame.display, mouse_pos: pygame.mouse) -> None:
@@ -263,7 +279,7 @@ def main():
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Pressed 'SOLVE' button
-                if 730 < mouse_pos[0] < 970 and 200 < mouse_pos[1] < 270:
+                if 730 < mouse_pos[0] < 970 and 230 < mouse_pos[1] < 300:
                     solve_visual(puzzle)
 
                 # Pressed the 'SOLVE INSTANTLY' button
