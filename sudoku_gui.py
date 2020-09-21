@@ -12,18 +12,17 @@ BLUE = (43, 94, 161)
 LIGHT_BLUE = (66, 112, 173)
 GRAY = (100, 100, 100)
 LIGHT_GRAY = (150, 150, 150)
-RED = (150, 25, 25)
-RED_2 = (148, 55, 47)
+RED = (148, 55, 47)
 ORANGE = (199, 130, 66)
 YELLOW = (207, 186, 68)
 YELLOW_GREEN = (200, 209, 67)
 GREEN = (81, 138, 45)
 
-speed_1_col = RED_2
-speed_2_col = ORANGE
-speed_3_col = YELLOW
-speed_4_col = GRAY
-speed_5_col = GRAY
+speed_1_col = True
+speed_2_col = True
+speed_3_col = True
+speed_4_col = False
+speed_5_col = False
 
 puzzle_num = 0
 puzzle = [[3, 0, 6, 5, 0, 8, 4, 0, 0],
@@ -100,28 +99,34 @@ def solve_visual(board: list) -> bool:
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
+
                 # Pressed one of the speed options
-                if 694 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
-                    pygame.draw.rect(display, RED, ((689, 545), (65, 65)))
-                    speed_2_col = GRAY
-                    speed_3_col = GRAY
-                    speed_4_col = GRAY
-                    speed_5_col = GRAY
+                if 688 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
+                    speed_2_col = False
+                    speed_3_col = False
+                    speed_4_col = False
+                    speed_5_col = False
                     SPEED = 30
                 if 753 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
-                    speed_2_col = ORANGE
-                    SPEED = 90
+                    speed_2_col = True
+                    SPEED = 60
                 if 823 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
-                    speed_3_col = YELLOW
-                    SPEED = 150
+                    speed_3_col = True
+                    SPEED = 120
                 if 888 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
-                    speed_4_col = YELLOW_GREEN
-                    SPEED = 250
+                    speed_4_col = True
+                    SPEED = 240
                 if 953 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
-                    speed_5_col = GREEN
+                    speed_5_col = True
                     SPEED = -1
+
                 # Pressed the 'SOLVE INSTANTLY' button
                 if 730 < mouse_pos[0] < 970 and 340 < mouse_pos[1] < 410:
+                    button_font = pygame.font.SysFont('freesansbold.ttf', 48)
+                    r = pygame.draw.rect(display, WHITE, ((730, 340), (240, 70)))
+                    display.blit(button_font.render('SOLVING...', True, DARK_BLUE), (768, 360))
+                    pygame.display.update(r)
+
                     solver.solve(puzzle_copy)
                     puzzle = puzzle_copy
                     draw_empty_board(display)
@@ -208,53 +213,33 @@ def generate_puzzle() -> None:
 
 def draw_buttons(display: pygame.display, mouse_pos: pygame.mouse) -> None:
     button_font = pygame.font.SysFont('freesansbold.ttf', 48)
-    solve_button_surface = button_font.render('SOLVE', True, DARK_BLUE)
-    new_puzzle_button_surface = button_font.render('NEW PUZZLE', True, DARK_BLUE)
-    solve_instant_button_surface = button_font.render('SOLVE', True, DARK_BLUE)
-    solve_instant_2_button_surface = button_font.render('INSTANTLY', True, DARK_BLUE)
 
-    # New puzzle button
-    if 730 < mouse_pos[0] < 970 and 120 < mouse_pos[1] < 190:
-        pygame.draw.rect(display, LIGHT_BLUE, ((725, 115), (250, 80)))
-    pygame.draw.rect(display, WHITE, ((730, 120), (240, 70)))
-    display.blit(new_puzzle_button_surface, (742, 142))
-
-    # Solve button
-    if 730 < mouse_pos[0] < 970 and 230 < mouse_pos[1] < 300:
-        pygame.draw.rect(display, LIGHT_BLUE, ((725, 225), (250, 80)))
-    pygame.draw.rect(display, WHITE, ((730, 230), (240, 70)))
-    display.blit(solve_button_surface, (796, 252))
-
-    if 730 < mouse_pos[0] < 970 and 340 < mouse_pos[1] < 410:
-        pygame.draw.rect(display, LIGHT_BLUE, ((725, 335), (250, 80)))
-    pygame.draw.rect(display, WHITE, ((730, 340), (240, 70)))
-    display.blit(solve_instant_button_surface, (796, 342))
-    display.blit(solve_instant_2_button_surface, (758, 372))
+    for i in range(3):
+        if 730 < mouse_pos[0] < 970 and 120 + (110 * i) < mouse_pos[1] < 190 + (110 * i):
+            pygame.draw.rect(display, LIGHT_BLUE, ((725, 115 + (110 * i)), (250, 80)))
+        pygame.draw.rect(display, WHITE, ((730, 120 + (110 * i)), (240, 70)))
+    display.blit(button_font.render('NEW PUZZLE', True, DARK_BLUE), (742, 142))
+    display.blit(button_font.render('SOLVE', True, DARK_BLUE), (796, 252))
+    display.blit(button_font.render('QUICK SOLVE', True, DARK_BLUE), (738, 361))
 
     # Speed button
     draw_speed(display, mouse_pos)
 
 
 def draw_speed(display, mouse_pos) -> None:
+    colors = [(speed_1_col, RED), (speed_2_col, ORANGE), (speed_3_col, YELLOW), (speed_4_col, YELLOW_GREEN),
+              (speed_5_col, GREEN)]
     button_font = pygame.font.SysFont('freesansbold.ttf', 48)
-    if 694 < mouse_pos[0] < 754 and 550 < mouse_pos[1] < 605:
-        pygame.draw.rect(display, WHITE, ((689, 545), (65, 65)))
-    if 753 < mouse_pos[0] < 824 and 550 < mouse_pos[1] < 605:
-        pygame.draw.rect(display, WHITE, ((689, 545), (130, 65)))
-    if 823 < mouse_pos[0] < 889 and 550 < mouse_pos[1] < 605:
-        pygame.draw.rect(display, WHITE, ((689, 545), (195, 65)))
-    if 888 < mouse_pos[0] < 954 and 550 < mouse_pos[1] < 605:
-        pygame.draw.rect(display, WHITE, ((689, 545), (260, 65)))
-    if 953 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
-        pygame.draw.rect(display, WHITE, ((689, 545), (325, 65)))
-
+    for i in range(5):
+        if 688 + (65 * i) < mouse_pos[0] <= 754 + (65 * i) and 550 < mouse_pos[1] < 605:
+            pygame.draw.rect(display, WHITE, ((689, 545), (65 * (i + 1), 65)))
+    for i in range(5):
+        if colors[i][0]:
+            pygame.draw.rect(display, colors[i][1], ((694 + (i * 65), 550), (55, 55)))
+        else:
+            pygame.draw.rect(display, GRAY, ((694 + (i * 65), 550), (55, 55)))
     speed_text_surface = button_font.render('SPEED', True, WHITE)
     display.blit(speed_text_surface, (796, 500))
-    pygame.draw.rect(display, speed_1_col, ((694, 550), (55, 55)))
-    pygame.draw.rect(display, speed_2_col, ((759, 550), (55, 55)))
-    pygame.draw.rect(display, speed_3_col, ((824, 550), (55, 55)))
-    pygame.draw.rect(display, speed_4_col, ((889, 550), (55, 55)))
-    pygame.draw.rect(display, speed_5_col, ((954, 550), (55, 55)))
 
 
 def main():
@@ -264,7 +249,6 @@ def main():
     while running:
         display = pygame.display.set_mode((1080, 720))
         display.fill(DARK_BLUE)
-
         draw_empty_board(display)
         draw_numbers(display, puzzle, DARK_BLUE)
         mouse_pos = pygame.mouse.get_pos()
@@ -281,6 +265,10 @@ def main():
 
                 # Pressed the 'SOLVE INSTANTLY' button
                 if 730 < mouse_pos[0] < 970 and 340 < mouse_pos[1] < 410:
+                    button_font = pygame.font.SysFont('freesansbold.ttf', 48)
+                    r = pygame.draw.rect(display, WHITE, ((730, 340), (240, 70)))
+                    display.blit(button_font.render('SOLVING...', True, DARK_BLUE), (768, 360))
+                    pygame.display.update(r)
                     solver.solve(puzzle)
 
                 # Pressed 'NEW PUZZLE' button
@@ -293,24 +281,24 @@ def main():
                 global speed_4_col
                 global speed_5_col
                 global SPEED
-                if 694 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
-                    pygame.draw.rect(display, RED, ((689, 545), (65, 65)))
-                    speed_2_col = GRAY
-                    speed_3_col = GRAY
-                    speed_4_col = GRAY
-                    speed_5_col = GRAY
+
+                if 688 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
+                    speed_2_col = False
+                    speed_3_col = False
+                    speed_4_col = False
+                    speed_5_col = False
                     SPEED = 30
                 if 753 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
-                    speed_2_col = ORANGE
+                    speed_2_col = True
                     SPEED = 60
                 if 823 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
-                    speed_3_col = YELLOW
+                    speed_3_col = True
                     SPEED = 120
                 if 888 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
-                    speed_4_col = YELLOW_GREEN
+                    speed_4_col = True
                     SPEED = 240
                 if 953 < mouse_pos[0] < 1019 and 550 < mouse_pos[1] < 605:
-                    speed_5_col = GREEN
+                    speed_5_col = True
                     SPEED = -1
         pygame.display.update()
 
